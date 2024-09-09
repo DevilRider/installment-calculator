@@ -7,6 +7,7 @@ import (
 	"installment-calculator/constants"
 	"installment-calculator/installment"
 	"installment-calculator/repayment/readjustment_strategy"
+	"installment-calculator/utils"
 	"time"
 )
 
@@ -56,11 +57,13 @@ func (calculator PartialRepaymentCalculator) Calculate() (*[]beans.Installment, 
 		newInstallments, total := p.Generate(amount.InexactFloat64(), tenors, calculator.installmentInfo.AnnualPercentageRate)
 		finalInstallmentInterest := decimal.NewFromFloat(total).Sub(amount)
 		logrus.Infof("[%s]ReduceMonthlyRepayment: original installments: %v(%d), new installments: %v(%d)", calculator.installmentInfo.Strategy, currentInstallment.Amount.RoundBank(constants.DefaultRoundPlaces), calculator.installmentInfo.Tenors, newInstallments[0].Amount.RoundBank(constants.DefaultRoundPlaces), tenors)
+		utils.NewOutputor(amount.InexactFloat64(), total, newInstallments).Output()
 		return &newInstallments, total, fee, originalInstallmentInterest.Sub(finalInstallmentInterest).RoundDown(2).InexactFloat64()
 	case readjustment_strategy.ShortenRepaymentTenors:
 		newInstallments, total := calculator.rematchInstallments(tenors, amount, currentInstallment.Amount, calculator.installmentInfo.AnnualPercentageRate)
 		finalInstallmentInterest := decimal.NewFromFloat(total).Sub(amount)
-		logrus.Infof("[%s]ShortenRepaymentTenors: original installments: %v(%d), new installments: %v(%d)", calculator.installmentInfo.Strategy, currentInstallment.Amount.RoundBank(constants.DefaultRoundPlaces), calculator.installmentInfo.Tenors, newInstallments[0].Amount.RoundBank(constants.DefaultRoundPlaces), tenors)
+		logrus.Infof("[%s]ShortenRepaymentTenors: original installments: %v(%d), new installments: %v(%d)", calculator.installmentInfo.Strategy, currentInstallment.Amount.RoundBank(constants.DefaultRoundPlaces), calculator.installmentInfo.Tenors, newInstallments[0].Amount.RoundBank(constants.DefaultRoundPlaces), len(newInstallments))
+		utils.NewOutputor(amount.InexactFloat64(), total, newInstallments).Output()
 		return &newInstallments, total, fee, originalInstallmentInterest.Sub(finalInstallmentInterest).RoundDown(2).InexactFloat64()
 	default:
 		panic("unsupported readjustment_strategy strategy")
