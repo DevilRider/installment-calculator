@@ -1,9 +1,11 @@
 package test
 
 import (
+	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"installment-calculator/installment"
 	"installment-calculator/installment/installment_strategy"
+	"installment-calculator/utils"
 	"testing"
 	"time"
 )
@@ -67,4 +69,22 @@ func Test_Installment_Outright(t *testing.T) {
 	assert.Equal(t, 2109.72, is2[0].Amount.RoundBank(2).InexactFloat64())
 	assert.Equal(t, 2041.67, is2[3].Amount.RoundBank(2).InexactFloat64())
 	assert.Equal(t, 1905.56, is2[13].Amount.RoundBank(2).InexactFloat64())
+}
+
+func Test_Installment_Annuity_r(t *testing.T) {
+	generator := installment.NewInstance(
+		installment.Strategy(installment_strategy.Annuity),
+		installment.DueDay(28),
+		installment.BorrowDate(time.Date(2024, 10, 1, 0, 0, 0, 0, time.UTC)),
+	)
+
+	amount := float64(225000)
+	tenors := 120
+	annualPercentageRate := 0.11
+	is1, ta1 := generator.Generate(amount, tenors, annualPercentageRate)
+	assert.Equal(t, tenors, len(is1))
+	logrus.Infof("total: %v, interest: %v", ta1, ta1-amount)
+	logrus.Infof("installment amount: %v", is1[0].Amount.RoundBank(2).InexactFloat64())
+
+	utils.NewOutputor(amount, ta1, is1).Output()
 }
