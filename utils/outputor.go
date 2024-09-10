@@ -30,13 +30,13 @@ func NewOutputor(principal float64, total float64, installments []beans.Installm
 
 	o.tenors = len(installments)
 	o.years = o.tenors / 12
-	o.interest = o.total.Sub(o.principal).Round(2)
+	o.interest = o.total.Sub(o.principal).RoundBank(2)
 	o.installmentAmount = o.installments[0].Amount
 	return o
 }
 
 func (o Outputor) Output() {
-	filename := fmt.Sprintf("%s %sw~%dYears[%s].txt", outputPath, o.principal.Div(decimal.NewFromInt(10000)).Round(2).String(), o.years, o.installmentAmount.Round(2).String())
+	filename := fmt.Sprintf("%s %sw~%dYears[%s].txt", outputPath, o.principal.Div(decimal.NewFromInt(10000)).RoundBank(2).String(), o.years, o.installmentAmount.RoundBank(2).String())
 	WriteCsv(filename, o.rows())
 	logrus.Infof("filename: %s", filename)
 }
@@ -58,9 +58,9 @@ func (o Outputor) rows() [][]string {
 func (o Outputor) header() [][]string {
 	var rows [][]string
 	rows = append(rows, []string{fmt.Sprintf("Borrow %s for %d Years.", o.principal.String(), o.years)})
-	rows = append(rows, []string{fmt.Sprintf("Installment Amount: %s", o.installmentAmount.Round(2).String())})
+	rows = append(rows, []string{fmt.Sprintf("Installment Amount: %s", o.installmentAmount.RoundBank(2).String())})
 	rows = append(rows, []string{fmt.Sprintf("Total Repayment Amount: %s", o.total.String())})
-	rows = append(rows, []string{fmt.Sprintf("Repayment Interest: %s", o.interest.Round(2).String())})
+	rows = append(rows, []string{fmt.Sprintf("Repayment Interest: %s", o.interest.RoundBank(2).String())})
 
 	return rows
 }
@@ -70,9 +70,9 @@ func (o Outputor) results() [][]string {
 	for _, i := range o.installments {
 		rows = append(rows, []string{
 			fmt.Sprintf("%d", i.Tenor),
-			i.Principal.Round(2).String(),
-			i.Interest.Round(2).String(),
-			i.PostPrincipal.Round(2).String()})
+			i.Principal.RoundBank(2).String(),
+			i.Interest.RoundBank(2).String(),
+			i.PostPrincipal.RoundBank(2).String()})
 	}
 	return rows
 }
