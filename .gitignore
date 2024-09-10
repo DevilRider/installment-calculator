@@ -2,3 +2,4 @@
 go.sum
 app-output
 vendor
+.github
