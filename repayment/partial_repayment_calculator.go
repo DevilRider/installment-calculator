@@ -38,10 +38,7 @@ func (calculator PartialRepaymentCalculator) Calculate() (*[]beans.Installment, 
 	}
 	currentInstallment := installments[currentTenor-1]
 	dailyInterestRate := decimal.NewFromFloat(calculator.installmentInfo.AnnualPercentageRate).Div(decimal.NewFromInt(constants.DaysOfYear))
-	interestDays := preDueDate.Sub(calculator.repaymentDate).Hours() / 24
-	if interestDays < 0 {
-		interestDays = 0
-	}
+	interestDays := calculator.repaymentDate.Sub(*preDueDate).Hours() / 24
 	interest := currentInstallment.PrePrincipal.Mul(dailyInterestRate).Mul(decimal.NewFromFloat(interestDays))
 	fineFee := decimal.NewFromFloat(constants.RepaymentFineRate).Mul(decimal.NewFromInt(calculator.repaymentAmount))
 

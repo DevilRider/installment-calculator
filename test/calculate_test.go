@@ -13,6 +13,9 @@ import (
 	"time"
 )
 
+// 2y 3% - 5.735%
+
+// 22.3 10y 7.2 - 12.126
 func Test_Calculate_Installment_Annuity(t *testing.T) {
 	borrowDate := time.Date(2024, 10, 1, 0, 0, 0, 0, time.UTC)
 	generator := installment.NewInstance(
@@ -21,9 +24,9 @@ func Test_Calculate_Installment_Annuity(t *testing.T) {
 		installment.BorrowDate(borrowDate),
 	)
 
-	amount := float64(225000)
+	amount := float64(223000)
 	tenors := 120
-	annualPercentageRate := 0.11
+	annualPercentageRate := 0.12126
 	is1, ta1 := generator.Generate(amount, tenors, annualPercentageRate)
 	assert.Equal(t, tenors, len(is1))
 	logrus.Infof("total: %v, interest: %v", ta1, ta1-amount)
@@ -35,9 +38,9 @@ func Test_Calculate_Installment_Annuity(t *testing.T) {
 func Test_Calculate_Partial_Repayment_Annuity_ShortenRepaymentTenors(t *testing.T) {
 	borrowDate := time.Date(2024, 10, 1, 0, 0, 0, 0, time.UTC)
 	installmentStrategy := installment_strategy.Annuity
-	amount := float64(225000)
+	amount := float64(223000)
 	tenors := 120
-	annualPercentageRate := 0.11
+	annualPercentageRate := 0.108
 
 	// time.Now()
 	repaymentDate := time.Date(2025, 10, 1, 0, 0, 0, 0, time.UTC)
